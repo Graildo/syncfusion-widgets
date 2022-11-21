@@ -6965,93 +6965,39 @@ class _SfCalendarState extends State<SfCalendar>
       focusNode: _focusNode,
       onKey: _onKeyDown,
       child: Stack(children: <Widget>[
-        Positioned(
-          top: 0,
-          right: 0,
-          left: 0,
-          height: widget.headerHeight,
-          child: GestureDetector(
-            child: Container(
-                color: widget.headerStyle.backgroundColor ??
-                    _calendarTheme.headerBackgroundColor,
-                child: _CalendarHeaderView(
-                    _currentViewVisibleDates,
-                    widget.headerStyle,
-                    null,
-                    _view,
-                    widget.monthViewSettings.numberOfWeeksInView,
-                    _calendarTheme,
-                    isRTL,
-                    _locale,
-                    widget.showNavigationArrow,
-                    _controller,
-                    widget.maxDate,
-                    widget.minDate,
-                    _minWidth,
-                    widget.headerHeight,
-                    widget.timeSlotViewSettings.nonWorkingDays,
-                    widget.monthViewSettings.navigationDirection,
-                    widget.showDatePickerButton,
-                    _showHeader,
-                    widget.allowedViews,
-                    widget.allowViewNavigation,
-                    _localizations,
-                    _removeDatePicker,
-                    _headerUpdateNotifier,
-                    _viewChangeNotifier,
-                    _handleOnTapForHeader,
-                    _handleOnLongPressForHeader,
-                    widget.todayHighlightColor,
-                    _textScaleFactor,
-                    _isMobilePlatform,
-                    widget.headerDateFormat,
-                    true,
-                    widget.todayTextStyle,
-                    widget.showWeekNumber,
-                    widget.weekNumberStyle,
-                    _timelineMonthWeekNumberNotifier,
-                    widget.cellBorderColor,
-                    widget.timeSlotViewSettings.numberOfDaysInView)),
-          ),
-        ),
-        Positioned(
-            top: widget.headerHeight,
-            left: 0,
-            right: 0,
-            height: height,
-            child: _OpacityWidget(
-                opacity: _opacity,
-                child: CustomScrollView(
-                  key: _scrollKey,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: _agendaScrollController,
-                  center: _scheduleViewKey,
-                  slivers: <Widget>[
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        if (_previousDates.length <= index) {
-                          return null;
-                        }
+        _OpacityWidget(
+            opacity: _opacity,
+            child: CustomScrollView(
+              key: _scrollKey,
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: _agendaScrollController,
+              center: _scheduleViewKey,
+              slivers: <Widget>[
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                    if (_previousDates.length <= index) {
+                      return null;
+                    }
 
-                        /// Send negative index value to differentiate the
-                        /// backward view from forward view.
-                        return _getItem(context, -(index + 1), isRTL);
-                      }),
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        if (_nextDates.length <= index) {
-                          return null;
-                        }
+                    /// Send negative index value to differentiate the
+                    /// backward view from forward view.
+                    return _getItem(context, -(index + 1), isRTL);
+                  }),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                    if (_nextDates.length <= index) {
+                      return null;
+                    }
 
-                        return _getItem(context, index, isRTL);
-                      }),
-                      key: _scheduleViewKey,
-                    ),
-                  ],
-                ))),
+                    return _getItem(context, index, isRTL);
+                  }),
+                  key: _scheduleViewKey,
+                ),
+              ],
+            )),
         _addDatePicker(widget.headerHeight, isRTL),
         _getCalendarViewPopup(),
       ]),
