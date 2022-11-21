@@ -177,6 +177,7 @@ class SfCalendar extends StatefulWidget {
     this.onLongPress,
     this.onSelectionChanged,
     this.controller,
+    this.agendaScrollController,
     this.appointmentTimeTextFormat,
     this.blackoutDates,
     this.scheduleViewMonthHeaderBuilder,
@@ -2240,6 +2241,7 @@ class SfCalendar extends StatefulWidget {
   ///}
   /// ```
   final CalendarController? controller;
+  final ScrollController? agendaScrollController;
 
   /// Allows to reschedule the appointment by resizing the appointment.
   ///
@@ -2509,6 +2511,8 @@ class SfCalendar extends StatefulWidget {
     }
     properties
         .add(DiagnosticsProperty<CalendarController>('controller', controller));
+    properties.add(DiagnosticsProperty<ScrollController>(
+        'agendaScrollController', agendaScrollController));
     properties.add(DiagnosticsProperty<TextStyle>(
         'appointmentTextStyle', appointmentTextStyle));
     properties.add(DiagnosticsProperty<TextStyle>(
@@ -2734,6 +2738,8 @@ class _SfCalendarState extends State<SfCalendar>
     _resourceHoverNotifier = ValueNotifier<Offset?>(null)
       ..addListener(_updateViewHeaderHover);
     _controller = widget.controller ?? CalendarController();
+    _agendaScrollController =
+        widget.agendaScrollController ?? ScrollController();
     _controller.getCalendarDetailsAtOffset = _getCalendarDetails;
     _controller.selectedDate ??= widget.initialSelectedDate;
     _selectedDate = _controller.selectedDate;
@@ -2756,7 +2762,8 @@ class _SfCalendarState extends State<SfCalendar>
     _resourceCollection =
         CalendarViewHelper.cloneList(widget.dataSource?.resources);
     if (_view == CalendarView.month && widget.monthViewSettings.showAgenda) {
-      _agendaScrollController = ScrollController();
+      _agendaScrollController =
+          widget.agendaScrollController ?? ScrollController();
     }
 
     if (CalendarViewHelper.isResourceEnabled(widget.dataSource, _view)) {
@@ -2811,6 +2818,9 @@ class _SfCalendarState extends State<SfCalendar>
           ?.removePropertyChangedListener(_calendarValueChangedListener);
       _controller.removePropertyChangedListener(_calendarValueChangedListener);
       _controller = widget.controller ?? CalendarController();
+      if (widget.agendaScrollController != null) {
+        _agendaScrollController = widget.agendaScrollController;
+      }
       if (widget.controller != null) {
         _controller.selectedDate = widget.controller!.selectedDate;
         _controller.currentDate =
@@ -2901,8 +2911,9 @@ class _SfCalendarState extends State<SfCalendar>
       }
       _forwardWidgetHeights = <int, _ScheduleViewDetails>{};
       _backwardWidgetHeights = <int, _ScheduleViewDetails>{};
-      _agendaScrollController = ScrollController()
-        ..addListener(_handleScheduleViewScrolled);
+      _agendaScrollController =
+          widget.agendaScrollController ?? ScrollController()
+            ..addListener(_handleScheduleViewScrolled);
       _scheduleMaxDate = null;
       _scheduleMinDate = null;
       _minDate = null;
@@ -2991,7 +3002,8 @@ class _SfCalendarState extends State<SfCalendar>
     if (_view == CalendarView.month &&
         widget.monthViewSettings.showAgenda &&
         _agendaScrollController == null) {
-      _agendaScrollController = ScrollController();
+      _agendaScrollController =
+          widget.agendaScrollController ?? ScrollController();
     }
 
     _showHeader = false;
@@ -3976,7 +3988,8 @@ class _SfCalendarState extends State<SfCalendar>
     _forwardWidgetHeights = <int, _ScheduleViewDetails>{};
     _backwardWidgetHeights = <int, _ScheduleViewDetails>{};
 
-    _agendaScrollController = ScrollController();
+    _agendaScrollController =
+        widget.agendaScrollController ?? ScrollController();
 
     /// Add listener for scroll view to handle the scroll view scroll position
     /// changes.
@@ -4171,7 +4184,8 @@ class _SfCalendarState extends State<SfCalendar>
 
         _fadeInController!.reset();
         _fadeInController!.forward();
-        _agendaScrollController = ScrollController();
+        _agendaScrollController =
+            widget.agendaScrollController ?? ScrollController();
         SchedulerBinding.instance.addPostFrameCallback((_) {
           final Widget? currentWidget = _customScrollViewKey.currentWidget;
 
