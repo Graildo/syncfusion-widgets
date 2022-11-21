@@ -2742,6 +2742,7 @@ class _SfCalendarState extends State<SfCalendar>
     _currentDate = DateTimeHelper.getDateTimeValue(getValidDate(widget.minDate,
         widget.maxDate, _controller.displayDate ?? widget.initialDisplayDate));
     _controller.displayDate = _currentDate;
+    _controller.currentDate = _currentDate;
     _scheduleDisplayDate = _controller.displayDate!;
     _controller.view ??= widget.view;
     _view = _controller.view!;
@@ -2812,6 +2813,8 @@ class _SfCalendarState extends State<SfCalendar>
       _controller = widget.controller ?? CalendarController();
       if (widget.controller != null) {
         _controller.selectedDate = widget.controller!.selectedDate;
+        _controller.currentDate =
+            widget.controller!.currentDate ?? _currentDate;
         _controller.displayDate =
             widget.controller!.displayDate ?? _currentDate;
         _scheduleDisplayDate =
@@ -2822,6 +2825,7 @@ class _SfCalendarState extends State<SfCalendar>
         _currentDate = DateTimeHelper.getDateTimeValue(getValidDate(
             widget.minDate, widget.maxDate, widget.initialDisplayDate));
         _controller.displayDate = _currentDate;
+        _controller.currentDate = _currentDate;
         _controller.view = widget.view;
       }
       _controller.getCalendarDetailsAtOffset = _getCalendarDetails;
@@ -2844,6 +2848,7 @@ class _SfCalendarState extends State<SfCalendar>
             widget.minDate, widget.maxDate, _updateCurrentDate(oldView)));
         _canScrollTimeSlotView = false;
         _controller.displayDate = _currentDate;
+        _controller.currentDate = _currentDate;
         _canScrollTimeSlotView = true;
         if (_view == CalendarView.schedule) {
           if (CalendarViewHelper.shouldRaiseViewChangedCallback(
@@ -2878,6 +2883,7 @@ class _SfCalendarState extends State<SfCalendar>
       }
 
       _controller.displayDate = _currentDate;
+      _controller.currentDate = _currentDate;
       _scheduleDisplayDate = _currentDate;
     }
 
@@ -2921,6 +2927,7 @@ class _SfCalendarState extends State<SfCalendar>
       _currentDate = DateTimeHelper.getDateTimeValue(getValidDate(
           widget.minDate, widget.maxDate, _updateCurrentDate(_view)));
       _controller.displayDate = _currentDate;
+      _controller.currentDate = _currentDate;
       if (_view == CalendarView.schedule) {
         if (CalendarViewHelper.shouldRaiseViewChangedCallback(
             widget.onViewChanged)) {
@@ -4006,6 +4013,9 @@ class _SfCalendarState extends State<SfCalendar>
         if (scrolledPosition >= widgetPosition &&
             scrolledPosition < widgetHeight) {
           DateTime date = _nextDates[i];
+          if (!isSameDate(_controller.currentDate, date)) {
+            _controller.currentDate = date;
+          }
 
           /// Check the view have intersection point, because intersection point
           /// tells the view does not have similar month dates. If it reaches
@@ -4045,6 +4055,10 @@ class _SfCalendarState extends State<SfCalendar>
         if (-scrolledPosition > widgetPosition &&
             -scrolledPosition <= widgetHeight) {
           DateTime date = _previousDates[i];
+
+          if (!isSameDate(_controller.currentDate, date)) {
+            _controller.currentDate = date;
+          }
 
           /// Check the view have intersection point, because intersection point
           /// tells the view does not have similar month dates. If it reaches

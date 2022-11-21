@@ -133,6 +133,7 @@ class CalendarValueChangedNotifier with Diagnosticable {
 class CalendarController extends CalendarValueChangedNotifier {
   DateTime? _selectedDate;
   DateTime? _displayDate;
+  DateTime? _currentDate;
   CalendarView? _view;
 
   /// The selected date in the [SfCalendar].
@@ -188,6 +189,7 @@ class CalendarController extends CalendarValueChangedNotifier {
   /// [MonthViewSettings.numberOfWeeksInView] property set with value greater
   /// than 4, this will return the first date of the current visible month.
   DateTime? get displayDate => _displayDate;
+  DateTime? get currentDate => _currentDate;
 
   /// Navigates to the given date programmatically without any animation in the
   /// [SfCalendar] by checking that the date falls in between the
@@ -227,6 +229,15 @@ class CalendarController extends CalendarValueChangedNotifier {
 
     _displayDate = date;
     notifyPropertyChangedListeners('displayDate');
+  }
+
+  set currentDate(DateTime? date) {
+    if (date == null) {
+      return;
+    }
+
+    _currentDate = date;
+    notifyPropertyChangedListeners('currentDate');
   }
 
   /// The displayed view of the [SfCalendar].
@@ -407,6 +418,7 @@ class CalendarController extends CalendarValueChangedNotifier {
     super.debugFillProperties(properties);
     properties.add(DiagnosticsProperty<DateTime>('selectedDate', selectedDate));
     properties.add(DiagnosticsProperty<DateTime>('displayDate', displayDate));
+    properties.add(DiagnosticsProperty<DateTime>('currentDate', currentDate));
     properties.add(EnumProperty<CalendarView>('view', view));
   }
 }
