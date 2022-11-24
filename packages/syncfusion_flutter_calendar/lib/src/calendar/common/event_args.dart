@@ -286,6 +286,15 @@ class CalendarDetails extends CalendarTouchDetails {
 typedef ScheduleViewMonthHeaderBuilder = Widget Function(
     BuildContext context, ScheduleViewMonthHeaderDetails details);
 
+/// Signature for a function that creates a widget based on week
+/// header details.
+///
+/// See also:
+/// * [SfCalendar.scheduleViewWeekHeaderBuilder], which matches this signature.
+/// * [SfCalendar], which uses this signature in one of it's callback.
+typedef ScheduleViewWeekHeaderBuilder = Widget Function(
+    ScheduleViewWeekHeaderDetails details);
+
 /// Signature for a function that creates a widget based on month cell details.
 ///
 /// See also:
@@ -377,6 +386,23 @@ class ScheduleViewMonthHeaderDetails {
 
   /// The position and size of the widget.
   final Rect bounds;
+}
+
+/// Contains the details that needed on schedule view week header builder.
+///
+/// See also:
+/// * [SfCalendar.scheduleViewWeekHeaderBuilder], which receives the
+/// information.
+/// * [SfCalendar], which passes the information to one of its receiver.
+class ScheduleViewWeekHeaderDetails {
+  /// Default constructor to store the details needed in builder
+  const ScheduleViewWeekHeaderDetails(this.startDate, this.endDate);
+
+  /// The week start date
+  final DateTime startDate;
+
+  /// The week end date
+  final DateTime? endDate;
 }
 
 /// Contains the details that needed on appointment view builder.

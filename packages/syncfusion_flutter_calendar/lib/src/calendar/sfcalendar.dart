@@ -13,6 +13,7 @@ import 'package:syncfusion_flutter_core/localizations.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:timezone/timezone.dart';
+import 'package:rect_getter/rect_getter.dart';
 
 import 'appointment_engine/appointment.dart';
 import 'appointment_engine/appointment_helper.dart';
@@ -178,9 +179,11 @@ class SfCalendar extends StatefulWidget {
     this.onSelectionChanged,
     this.controller,
     this.agendaScrollController,
+    this.agendaListViewKey,
     this.appointmentTimeTextFormat,
     this.blackoutDates,
     this.scheduleViewMonthHeaderBuilder,
+    this.scheduleViewWeekHeaderBuilder,
     this.monthCellBuilder,
     this.appointmentBuilder,
     this.timeRegionBuilder,
@@ -767,6 +770,34 @@ class SfCalendar extends StatefulWidget {
   ///  }
   ///  ```
   final ScheduleViewMonthHeaderBuilder? scheduleViewMonthHeaderBuilder;
+
+  /// A builder that builds a widget, replace the schedule week header
+  /// widget in calendar schedule view.
+  ///
+  /// See also:
+  /// * [scheduleViewSettings], to customize the schedule view of calendar.
+  ///
+  /// ```dart
+  /// @override
+  ///  Widget build(BuildContext context) {
+  ///    return Scaffold(
+  ///        body: Container(
+  ///            child: SfCalendar(
+  ///      view: CalendarView.schedule,
+  ///      scheduleViewWeekHeaderBuilder: (BuildContext buildContext,
+  ///               ScheduleViewWeekHeaderDetails details) {
+  ///        return Container(
+  ///          color: Colors.red,
+  ///          child: Text(
+  ///            details.startDate + ' - ' +
+  ///               details.endDate,
+  ///          ),
+  ///        );
+  ///      },
+  ///    )));
+  ///  }
+  ///  ```
+  final ScheduleViewWeekHeaderBuilder? scheduleViewWeekHeaderBuilder;
 
   /// The first day of the week in the [SfCalendar].
   ///
@@ -2242,6 +2273,7 @@ class SfCalendar extends StatefulWidget {
   /// ```
   final CalendarController? controller;
   final ScrollController? agendaScrollController;
+  final GlobalKey<RectGetterState>? agendaListViewKey;
 
   /// Allows to reschedule the appointment by resizing the appointment.
   ///
@@ -2554,6 +2586,8 @@ class SfCalendar extends StatefulWidget {
         'onSelectionChanged', onSelectionChanged));
     properties.add(DiagnosticsProperty<ScheduleViewMonthHeaderBuilder>(
         'scheduleViewMonthHeaderBuilder', scheduleViewMonthHeaderBuilder));
+    properties.add(DiagnosticsProperty<ScheduleViewWeekHeaderBuilder>(
+        'scheduleViewWeekHeaderBuilder', scheduleViewWeekHeaderBuilder));
     properties.add(DiagnosticsProperty<MonthCellBuilder>(
         'monthCellBuilder', monthCellBuilder));
     properties.add(DiagnosticsProperty<CalendarAppointmentBuilder>(
@@ -2901,7 +2935,7 @@ class _SfCalendarState extends State<SfCalendar>
             oldWidget.loadMoreWidgetBuilder != null) ||
         (widget.loadMoreWidgetBuilder != null &&
             oldWidget.loadMoreWidgetBuilder == null)) {
-      _scrollKey = UniqueKey();
+      _scrollKey = widget.agendaListViewKey ?? UniqueKey();
       _nextDates = <DateTime>[];
       _previousDates = <DateTime>[];
       if (_view == CalendarView.schedule) {
@@ -3981,7 +4015,7 @@ class _SfCalendarState extends State<SfCalendar>
   }
 
   void _initScheduleViewProperties() {
-    _scrollKey = UniqueKey();
+    _scrollKey = widget.agendaListViewKey ?? UniqueKey();
     _nextDates = <DateTime>[];
     _previousDates = <DateTime>[];
     _headerUpdateNotifier = ValueNotifier<DateTime>(_scheduleDisplayDate);
@@ -5805,7 +5839,7 @@ class _SfCalendarState extends State<SfCalendar>
       }
 
       widgets.add(_getMonthOrWeekHeader(startDate, endDate, isRTL, false,
-          viewPadding: viewPadding, isNeedTopPadding: isNeedMonthBuilder));
+          viewPadding: viewPadding + 16, isNeedTopPadding: isNeedMonthBuilder));
 
       /// Add the height of week label to update the top position of next view.
       topHeight += widget.scheduleViewSettings.weekHeaderSettings.height;
@@ -6287,7 +6321,10 @@ class _SfCalendarState extends State<SfCalendar>
       _backwardWidgetHeights[-currentIndex - 1] = scheduleViewDetails;
     }
 
-    return SizedBox(height: height, child: Column(children: widgets));
+    return SizedBox(
+        height: height,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, children: widgets));
   }
 
   Widget _getMonthOrWeekHeader(
@@ -6304,20 +6341,22 @@ class _SfCalendarState extends State<SfCalendar>
       headerWidget = widget.scheduleViewMonthHeaderBuilder!(context, details);
     }
 
-    return GestureDetector(
-        child: Container(
-            padding: isMonthLabel
-                ? EdgeInsets.fromLTRB(0, isNeedTopPadding ? padding : 0, 0, 0)
-                : EdgeInsets.fromLTRB(isRTL ? 0 : viewPadding,
-                    isNeedTopPadding ? padding : 0, isRTL ? viewPadding : 0, 0),
-            child: RepaintBoundary(
-                child: headerWidget != null
-                    ? SizedBox(
-                        width: _minWidth,
-                        height: widget
-                            .scheduleViewSettings.monthHeaderSettings.height,
-                        child: headerWidget,
-                      )
+    return Container(
+        padding: isMonthLabel
+            ? EdgeInsets.fromLTRB(0, isNeedTopPadding ? padding : 0, 0, 0)
+            : EdgeInsets.fromLTRB(isRTL ? 0 : viewPadding,
+                isNeedTopPadding ? padding : 0, isRTL ? viewPadding : 0, 0),
+        child: RepaintBoundary(
+            child: headerWidget != null
+                ? SizedBox(
+                    width: _minWidth,
+                    height:
+                        widget.scheduleViewSettings.monthHeaderSettings.height,
+                    child: headerWidget,
+                  )
+                : widget.scheduleViewWeekHeaderBuilder != null
+                    ? widget.scheduleViewWeekHeaderBuilder!(
+                        ScheduleViewWeekHeaderDetails(startDate, endDate))
                     : CustomPaint(
                         painter: _ScheduleLabelPainter(
                             startDate,
@@ -6340,39 +6379,7 @@ class _SfCalendarState extends State<SfCalendar>
                                 _minWidth - viewPadding - (2 * padding),
                                 widget.scheduleViewSettings.weekHeaderSettings
                                     .height),
-                      ))),
-        onTapUp: (TapUpDetails details) {
-          _removeDatePicker();
-          if (!CalendarViewHelper.shouldRaiseCalendarTapCallback(
-              widget.onTap)) {
-            return;
-          }
-
-          CalendarViewHelper.raiseCalendarTapCallback(
-              widget,
-              DateTime(startDate.year, startDate.month, startDate.day),
-              null,
-              isMonthLabel
-                  ? CalendarElement.header
-                  : CalendarElement.viewHeader,
-              null);
-        },
-        onLongPressStart: (LongPressStartDetails details) {
-          _removeDatePicker();
-          if (!CalendarViewHelper.shouldRaiseCalendarLongPressCallback(
-              widget.onLongPress)) {
-            return;
-          }
-
-          CalendarViewHelper.raiseCalendarLongPressCallback(
-              widget,
-              DateTime(startDate.year, startDate.month, startDate.day),
-              null,
-              isMonthLabel
-                  ? CalendarElement.header
-                  : CalendarElement.viewHeader,
-              null);
-        });
+                      )));
   }
 
   Widget _getDisplayDateView(
@@ -6946,9 +6953,9 @@ class _SfCalendarState extends State<SfCalendar>
             allDayAppointmentHeight);
         if (initialScrollPosition != 0) {
           _agendaScrollController?.removeListener(_handleScheduleViewScrolled);
-          _agendaScrollController =
+          _agendaScrollController = widget.agendaScrollController ??
               ScrollController(initialScrollOffset: initialScrollPosition)
-                ..addListener(_handleScheduleViewScrolled);
+            ..addListener(_handleScheduleViewScrolled);
         }
       } else if (viewStartDate.isBefore(scheduleDisplayDate)) {
         DateTime visibleStartDate = viewStartDate;
@@ -7762,7 +7769,7 @@ class _SfCalendarState extends State<SfCalendar>
         _agendaScrollController =
             ScrollController(initialScrollOffset: initialScrolledPosition)
               ..addListener(_handleScheduleViewScrolled);
-        _scrollKey = UniqueKey();
+        _scrollKey = widget.agendaListViewKey ?? UniqueKey();
       }
     }
 
