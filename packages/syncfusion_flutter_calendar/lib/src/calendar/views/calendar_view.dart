@@ -11502,7 +11502,7 @@ class _ViewHeaderViewPainter extends CustomPainter {
               2;
 
       _dayTextPainter.paint(
-          canvas, Offset(xPosition + dayXPosition, yPosition));
+          canvas, Offset(xPosition + dayXPosition, yPosition - 4));
 
       if (isToday) {
         _drawTodayCircle(
