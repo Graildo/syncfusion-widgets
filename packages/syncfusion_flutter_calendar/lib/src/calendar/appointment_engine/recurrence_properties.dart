@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart'
     show IterableDiagnostics;
@@ -707,7 +708,7 @@ class RecurrenceProperties with Diagnosticable {
         recurrenceProperties.endDate == endDate &&
         recurrenceProperties.interval == interval &&
         recurrenceProperties.recurrenceRange == recurrenceRange &&
-        recurrenceProperties.weekDays == weekDays &&
+        listEquals(recurrenceProperties.weekDays, weekDays) &&
         recurrenceProperties.week == week &&
         recurrenceProperties.dayOfMonth == dayOfMonth &&
         recurrenceProperties.dayOfWeek == dayOfWeek &&
