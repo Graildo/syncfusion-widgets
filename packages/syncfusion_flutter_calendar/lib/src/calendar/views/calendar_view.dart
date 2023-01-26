@@ -2286,7 +2286,7 @@ class _CustomCalendarScrollViewState extends State<CustomCalendarScrollView>
     final dynamic newAppointment =
         _getCalendarAppointmentToObject(appointment, widget.calendar);
 
-    widget.calendar.dataSource!.appointments!.add(newAppointment);
+    // widget.calendar.dataSource!.appointments!.add(newAppointment);
     widget.calendar.dataSource!.notifyListeners(
         CalendarDataSourceAction.add, <dynamic>[newAppointment]);
 

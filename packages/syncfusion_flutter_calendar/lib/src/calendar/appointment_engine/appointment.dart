@@ -1,7 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart'
-    show IterableDiagnostics;
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../../calendar.dart';
 
@@ -65,7 +65,7 @@ import '../../../calendar.dart';
 ///   return DataSource(appointments);
 /// }
 ///  ```
-class Appointment with Diagnosticable {
+class Appointment extends Equatable with Diagnosticable {
   /// Creates an appointment data for [SfCalendar].
   ///
   /// An object that contains properties to hold the detailed information
@@ -948,34 +948,51 @@ class Appointment with Diagnosticable {
   }
 
   @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(dynamic other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
+  List<Object?> get props => <dynamic>[
+        startTime,
+        endTime,
+        startTimeZone,
+        endTimeZone,
+        isAllDay,
+        notes,
+        location,
+        resourceIds,
+        subject,
+        color,
+        recurrenceExceptionDates,
+        recurrenceId,
+        id,
+        appointmentType,
+      ];
+  // @override
+  // // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  // bool operator ==(dynamic other) {
+  //   if (identical(this, other)) {
+  //     return true;
+  //   }
+  //   if (other.runtimeType != runtimeType) {
+  //     return false;
+  //   }
 
-    late final Appointment otherStyle;
-    if (other is Appointment) {
-      otherStyle = other;
-    }
-    return otherStyle.startTime == startTime &&
-        otherStyle.endTime == endTime &&
-        otherStyle.startTimeZone == startTimeZone &&
-        otherStyle.endTimeZone == endTimeZone &&
-        otherStyle.isAllDay == isAllDay &&
-        otherStyle.notes == notes &&
-        otherStyle.location == location &&
-        otherStyle.resourceIds == resourceIds &&
-        otherStyle.subject == subject &&
-        otherStyle.color == color &&
-        otherStyle.recurrenceExceptionDates == recurrenceExceptionDates &&
-        otherStyle.recurrenceId == recurrenceId &&
-        otherStyle.id == id &&
-        otherStyle.appointmentType == appointmentType;
-  }
+  //   late final Appointment otherStyle;
+  //   if (other is Appointment) {
+  //     otherStyle = other;
+  //   }
+  //   return otherStyle.startTime == startTime &&
+  //       otherStyle.endTime == endTime &&
+  //       otherStyle.startTimeZone == startTimeZone &&
+  //       otherStyle.endTimeZone == endTimeZone &&
+  //       otherStyle.isAllDay == isAllDay &&
+  //       otherStyle.notes == notes &&
+  //       otherStyle.location == location &&
+  //       otherStyle.resourceIds == resourceIds &&
+  //       otherStyle.subject == subject &&
+  //       otherStyle.color == color &&
+  //       otherStyle.recurrenceExceptionDates == recurrenceExceptionDates &&
+  //       otherStyle.recurrenceId == recurrenceId &&
+  //       otherStyle.id == id &&
+  //       otherStyle.appointmentType == appointmentType;
+  // }
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes

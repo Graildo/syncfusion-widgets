@@ -171,8 +171,15 @@ class CalendarViewHelper {
   /// Return schedule view appointment height and its value based on
   /// schedule view settings and month view settings.
   static double getScheduleAppointmentHeight(
-      MonthViewSettings? monthViewSettings,
-      ScheduleViewSettings? scheduleViewSettings) {
+    MonthViewSettings? monthViewSettings,
+    ScheduleViewSettings? scheduleViewSettings,
+    dynamic appointmentData,
+  ) {
+    try {
+      if (appointmentData?.height != null) {
+        return appointmentData.height;
+      }
+    } on NoSuchMethodError {}
     return monthViewSettings != null
         ? (monthViewSettings.agendaItemHeight == -1
             ? 50
@@ -186,8 +193,15 @@ class CalendarViewHelper {
   /// Return schedule view all day appointment height and its value based on
   /// schedule view settings and month view settings.
   static double getScheduleAllDayAppointmentHeight(
-      MonthViewSettings? monthViewSettings,
-      ScheduleViewSettings? scheduleViewSettings) {
+    MonthViewSettings? monthViewSettings,
+    ScheduleViewSettings? scheduleViewSettings,
+    dynamic appointmentData,
+  ) {
+    try {
+      if (appointmentData?.height != null) {
+        return appointmentData.height;
+      }
+    } on NoSuchMethodError {}
     return monthViewSettings != null
         ? (monthViewSettings.agendaItemHeight == -1
             ? 25

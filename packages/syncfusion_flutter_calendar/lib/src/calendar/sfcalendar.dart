@@ -3393,10 +3393,10 @@ class _SfCalendarState extends State<SfCalendar>
 
     final double appointmentViewHeight =
         CalendarViewHelper.getScheduleAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
     final double allDayAppointmentHeight =
         CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
 
     /// Calculate the divider height and color when it is web view.
     final double dividerHeight = _useMobilePlatformUI ? 0 : 1;
@@ -3636,8 +3636,12 @@ class _SfCalendarState extends State<SfCalendar>
 
       final double totalPadding = (eventsCount + 1) * padding;
       final double panelHeight = totalPadding +
-          ((eventsCount - allDayEventCount) * appointmentViewHeight) +
-          (allDayEventCount * allDayAppointmentHeight);
+          currentAppointments.fold(
+              0,
+              (sum, item) =>
+                  sum +
+                  CalendarViewHelper.getScheduleAppointmentHeight(
+                      null, widget.scheduleViewSettings, item.data));
       double appointmentViewPadding = 0;
       if (panelHeight < appointmentViewHeaderHeight) {
         appointmentViewPadding = appointmentViewHeaderHeight - panelHeight;
@@ -3816,7 +3820,7 @@ class _SfCalendarState extends State<SfCalendar>
   void dispose() {
     if (_agendaScrollController != null) {
       _agendaScrollController!.removeListener(_handleScheduleViewScrolled);
-      _agendaScrollController!.dispose();
+      // _agendaScrollController!.dispose();
       _agendaScrollController = null;
     }
 
@@ -4279,7 +4283,7 @@ class _SfCalendarState extends State<SfCalendar>
             _updateCurrentVisibleDates();
             _agendaScrollController
                 ?.removeListener(_handleScheduleViewScrolled);
-            _agendaScrollController!.dispose();
+            // _agendaScrollController!.dispose();
             _initScheduleViewProperties();
           });
           break;
@@ -5758,10 +5762,10 @@ class _SfCalendarState extends State<SfCalendar>
         : 0;
     final double appointmentViewHeight =
         CalendarViewHelper.getScheduleAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
     final double allDayAppointmentHeight =
         CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
 
     /// Calculate the divider height and color when it is web view.
     final double dividerHeight = _useMobilePlatformUI ? 0 : 1;
@@ -5784,9 +5788,14 @@ class _SfCalendarState extends State<SfCalendar>
         allDayEventCount = _getAllDayCount(currentDateAppointment);
       }
 
-      double panelHeight =
-          ((eventsCount - allDayEventCount) * appointmentViewHeight) +
-              (allDayEventCount * allDayAppointmentHeight);
+      // double panelHeight = ((eventsCount - allDayEventCount) * 80) +
+      //     (allDayEventCount * allDayAppointmentHeight);
+      double panelHeight = currentDateAppointment.fold(
+          0,
+          (sum, item) =>
+              sum +
+              CalendarViewHelper.getScheduleAppointmentHeight(
+                  null, widget.scheduleViewSettings, item.data));
       panelHeight = panelHeight > appointmentViewHeight
           ? panelHeight
           : appointmentViewHeight;
@@ -5814,11 +5823,11 @@ class _SfCalendarState extends State<SfCalendar>
 
     /// Get the previous view end position used to find the next view end
     /// position.
-    if (currentIndex >= 0) {
+    if (currentIndex >= 0 && _forwardWidgetHeights[currentIndex - 1] != null) {
       previousHeight = currentIndex == 0
           ? 0
           : _forwardWidgetHeights[currentIndex - 1]!._height;
-    } else {
+    } else if (_backwardWidgetHeights[-currentIndex - 2] != null) {
       previousHeight = currentIndex == -1
           ? 0
           : _backwardWidgetHeights[-currentIndex - 2]!._height;
@@ -6043,8 +6052,12 @@ class _SfCalendarState extends State<SfCalendar>
 
       final double totalPadding = (eventsCount + 1) * padding;
       final double panelHeight = totalPadding +
-          ((eventsCount - allDayEventCount) * appointmentViewHeight) +
-          (allDayEventCount * allDayAppointmentHeight);
+          currentAppointments.fold(
+              0,
+              (sum, item) =>
+                  sum +
+                  CalendarViewHelper.getScheduleAppointmentHeight(
+                      null, widget.scheduleViewSettings, item.data));
       double appointmentViewTopPadding = 0;
       double appointmentViewPadding = 0;
       if (panelHeight < appointmentViewHeaderHeight) {
@@ -6534,11 +6547,6 @@ class _SfCalendarState extends State<SfCalendar>
     } else {
       /// Calculate the touch position appointment from its collection.
       double currentYPosition = padding;
-      final double itemHeight = CalendarViewHelper.getScheduleAppointmentHeight(
-          null, widget.scheduleViewSettings);
-      final double allDayItemHeight =
-          CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-              null, widget.scheduleViewSettings);
       if (isDisplayDate) {
         if (isTapCallback) {
           CalendarViewHelper.raiseCalendarTapCallback(
@@ -6561,6 +6569,12 @@ class _SfCalendarState extends State<SfCalendar>
 
       for (int k = 0; k < appointments.length; k++) {
         final CalendarAppointment appointment = appointments[k];
+        final double itemHeight =
+            CalendarViewHelper.getScheduleAppointmentHeight(
+                null, widget.scheduleViewSettings, appointment.data);
+        final double allDayItemHeight =
+            CalendarViewHelper.getScheduleAllDayAppointmentHeight(
+                null, widget.scheduleViewSettings, appointment.data);
         final double currentAppointmentHeight =
             (_useMobilePlatformUI && _isAllDayAppointmentView(appointment)
                     ? allDayItemHeight
@@ -6665,10 +6679,10 @@ class _SfCalendarState extends State<SfCalendar>
 
     final double appointmentViewHeight =
         CalendarViewHelper.getScheduleAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
     final double allDayAppointmentHeight =
         CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
 
     /// Get the view first date based on specified
     /// display date  and first day of week.
@@ -6849,6 +6863,7 @@ class _SfCalendarState extends State<SfCalendar>
 
       int allDayCount = 0;
       int numberOfEvents = 0;
+      double appointmentsHeight = 0;
       for (int i = 0; i < dateAppointmentKeys.length; i++) {
         final List<CalendarAppointment> currentDateAppointment =
             dateAppointments[dateAppointmentKeys[i]]!;
@@ -6857,6 +6872,12 @@ class _SfCalendarState extends State<SfCalendar>
         }
 
         numberOfEvents += currentDateAppointment.length;
+        appointmentsHeight += currentDateAppointment.fold(
+            0,
+            (sum, item) =>
+                sum +
+                CalendarViewHelper.getScheduleAppointmentHeight(
+                    null, widget.scheduleViewSettings, item.data));
       }
 
       /// Check the next dates collection appointments height fills the view
@@ -6914,10 +6935,8 @@ class _SfCalendarState extends State<SfCalendar>
           }
         }
 
-        totalHeight = ((numberOfEvents + 1) * padding) +
-            ((numberOfEvents - allDayCount) * appointmentViewHeight) +
-            (allDayCount * allDayAppointmentHeight) +
-            labelHeight;
+        totalHeight =
+            ((numberOfEvents + 1) * padding) + appointmentsHeight + labelHeight;
       }
 
       /// Update the header date because the next dates insert the previous view
@@ -7159,10 +7178,10 @@ class _SfCalendarState extends State<SfCalendar>
 
     final double appointmentViewHeight =
         CalendarViewHelper.getScheduleAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
     final double allDayAppointmentHeight =
         CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-            null, widget.scheduleViewSettings);
+            null, widget.scheduleViewSettings, null);
 
     /// Get the view first date based on specified
     /// display date  and first day of week.
@@ -7352,6 +7371,7 @@ class _SfCalendarState extends State<SfCalendar>
 
       int allDayCount = 0;
       int numberOfEvents = 0;
+      double appointmentsHeight = 0;
       for (int i = 0; i < dateAppointmentKeys.length; i++) {
         final List<CalendarAppointment> currentDateAppointment =
             dateAppointments[dateAppointmentKeys[i]]!;
@@ -7360,6 +7380,12 @@ class _SfCalendarState extends State<SfCalendar>
         }
 
         numberOfEvents += currentDateAppointment.length;
+        appointmentsHeight += currentDateAppointment.fold(
+            0,
+            (sum, item) =>
+                sum +
+                CalendarViewHelper.getScheduleAppointmentHeight(
+                    null, widget.scheduleViewSettings, item.data));
       }
 
       /// Check the next dates collection appointments height fills the view
@@ -7473,10 +7499,10 @@ class _SfCalendarState extends State<SfCalendar>
       const double padding = 5;
       final double appointmentViewHeight =
           CalendarViewHelper.getScheduleAppointmentHeight(
-              null, widget.scheduleViewSettings);
+              null, widget.scheduleViewSettings, null);
       final double allDayAppointmentHeight =
           CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-              null, widget.scheduleViewSettings);
+              null, widget.scheduleViewSettings, null);
 
       /// Calculate the day label(May, 25) height based on appointment height
       /// and assign the label maximum height as 60.
@@ -7589,9 +7615,12 @@ class _SfCalendarState extends State<SfCalendar>
               allDayEventCount = _getAllDayCount(currentDateAppointment);
             }
 
-            double panelHeight =
-                ((eventsCount - allDayEventCount) * appointmentViewHeight) +
-                    (allDayEventCount * allDayAppointmentHeight);
+            double panelHeight = currentDateAppointment.fold(
+                0,
+                (sum, item) =>
+                    sum +
+                    CalendarViewHelper.getScheduleAppointmentHeight(
+                        null, widget.scheduleViewSettings, item.data));
             panelHeight = panelHeight > appointmentViewHeight
                 ? panelHeight
                 : appointmentViewHeight;
@@ -8932,10 +8961,10 @@ class _SfCalendarState extends State<SfCalendar>
         _agendaScrollController!.offset + localPosition.dy;
     final double actualAppointmentHeight =
         CalendarViewHelper.getScheduleAppointmentHeight(
-            widget.monthViewSettings, null);
+            widget.monthViewSettings, null, null);
     final double allDayAppointmentHeight =
         CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-            widget.monthViewSettings, null);
+            widget.monthViewSettings, null, null);
     for (int i = 0; i < agendaAppointments.length; i++) {
       final CalendarAppointment appointment = agendaAppointments[i];
       final double appointmentHeight = _isAllDayAppointmentView(appointment)
@@ -9054,10 +9083,10 @@ class _SfCalendarState extends State<SfCalendar>
     const double bottomPadding = 5;
     final double appointmentHeight =
         CalendarViewHelper.getScheduleAppointmentHeight(
-            widget.monthViewSettings, null);
+            widget.monthViewSettings, null, null);
     final double allDayAppointmentHeight =
         CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-            widget.monthViewSettings, null);
+            widget.monthViewSettings, null, null);
     double painterHeight = height;
     if (agendaAppointments.isNotEmpty) {
       final int count = _getAllDayCount(agendaAppointments);

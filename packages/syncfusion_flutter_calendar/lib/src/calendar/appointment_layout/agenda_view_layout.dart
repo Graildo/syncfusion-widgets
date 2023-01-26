@@ -191,15 +191,18 @@ class _AgendaViewLayoutState extends State<AgendaViewLayout> {
         (CalendarAppointment app1, CalendarAppointment app2) =>
             AppointmentHelper.orderAppointmentsAscending(
                 app1.isSpanned, app2.isSpanned));
-    final double agendaItemHeight =
-        CalendarViewHelper.getScheduleAppointmentHeight(
-            widget.monthViewSettings, widget.scheduleViewSettings);
-    final double agendaAllDayItemHeight =
-        CalendarViewHelper.getScheduleAllDayAppointmentHeight(
-            widget.monthViewSettings, widget.scheduleViewSettings);
-
     for (int i = 0; i < widget.appointments!.length; i++) {
       final CalendarAppointment appointment = widget.appointments![i];
+      final double agendaItemHeight =
+          CalendarViewHelper.getScheduleAppointmentHeight(
+              widget.monthViewSettings,
+              widget.scheduleViewSettings,
+              appointment.data);
+      final double agendaAllDayItemHeight =
+          CalendarViewHelper.getScheduleAllDayAppointmentHeight(
+              widget.monthViewSettings,
+              widget.scheduleViewSettings,
+              appointment.data);
       final bool isSpanned =
           appointment.actualEndTime.day != appointment.actualStartTime.day ||
               appointment.isSpanned;
